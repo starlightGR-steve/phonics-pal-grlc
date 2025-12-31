@@ -3,6 +3,17 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // Uses environment variables for security (never commit API keys to GitHub)
+
+// Debug: Log environment variables (will be removed in production)
+console.log('🔥 Firebase Config Debug:', {
+  hasApiKey: !!import.meta.env.VITE_FIREBASE_API_KEY,
+  hasAuthDomain: !!import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  hasProjectId: !!import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  hasStorageBucket: !!import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  apiKeyPrefix: import.meta.env.VITE_FIREBASE_API_KEY?.substring(0, 10) + '...',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
+});
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
