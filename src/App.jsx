@@ -782,9 +782,9 @@ const App = () => {
                 <button
                     key={item.id}
                     onClick={() => handleCardClick(item)}
-                    className={`group relative flex flex-col items-center justify-center p-3 py-5 rounded-xl border-2 bg-white transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95 ${borderColor} ${hasCustom ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+                    className={`group relative flex flex-col items-center justify-center p-3 py-5 rounded-xl border-2 bg-white transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95 ${borderColor} ${isAdmin && hasCustom ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
                 >
-                    {hasCustom && <div className="absolute top-2 right-2 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>}
+                    {isAdmin && hasCustom && <div className="absolute top-2 right-2 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>}
                     <span className="text-2xl mb-2 opacity-50 grayscale group-hover:grayscale-0 transition-all">{item.image}</span>
                     <span className={`text-2xl font-black tracking-tight ${textColor}`}>{item.letter.replace('_', ' ')}</span>
                     <span className={`mt-2 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${badgeColor}`}>{item.word}</span>
@@ -802,9 +802,9 @@ const App = () => {
                     {renderCardContent(filteredData[stackIndex])}
 
                     <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 mt-8 -mx-8 -mb-8 rounded-b-3xl">
-                        <button 
+                        <button
                             onClick={() => playAudioGeneric(filteredData[stackIndex].id, filteredData[stackIndex].voiceOver)}
-                            className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
+                            className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
                         >
                             {isPlaying === filteredData[stackIndex].id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> Play Sound</>}
                         </button>
@@ -850,11 +850,11 @@ const App = () => {
                 {renderCardContent(activeCard)}
             </div>
             <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4">
-              <button 
+              <button
                 onClick={() => playAudioGeneric(activeCard.id, activeCard.voiceOver)}
-                className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
+                className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
               >
-                {isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {customRecordings[activeCard.id] ? 'Play Custom' : `Play ${lessonMode ? 'Lesson' : 'Sound'}`}</>}
+                {isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : `Play ${lessonMode ? 'Lesson' : 'Sound'}`}</>}
               </button>
             </div>
           </div>
