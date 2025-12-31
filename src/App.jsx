@@ -827,40 +827,43 @@ const App = () => {
               <button onClick={() => setShowSettings(false)}><X className="w-5 h-5 text-slate-400" /></button>
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-3 block">Storage Location</label>
-                <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
-                  <button
-                    onClick={() => setUseFirebase(false)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                      !useFirebase
-                        ? 'bg-slate-700 text-white shadow-md'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <HardDrive className="w-4 h-4" />
-                    Local
-                  </button>
-                  <button
-                    onClick={() => setUseFirebase(true)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                      useFirebase
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Cloud className="w-4 h-4" />
-                    Cloud
-                  </button>
+              {/* Storage Location - ONLY SHOW IN TEACHER MODE */}
+              {isAdmin && (
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-3 block">Storage Location</label>
+                  <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+                    <button
+                      onClick={() => setUseFirebase(false)}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                        !useFirebase
+                          ? 'bg-slate-700 text-white shadow-md'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <HardDrive className="w-4 h-4" />
+                      Local
+                    </button>
+                    <button
+                      onClick={() => setUseFirebase(true)}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                        useFirebase
+                          ? 'bg-indigo-600 text-white shadow-md'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Cloud className="w-4 h-4" />
+                      Cloud
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    {useFirebase
+                      ? 'Audio saved to Firebase Storage (accessible across devices)'
+                      : 'Audio saved locally in your browser (this device only)'}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  {useFirebase
-                    ? 'Audio saved to Firebase Storage (accessible across devices)'
-                    : 'Audio saved locally in your browser (this device only)'}
-                </p>
-              </div>
+              )}
 
-              <div className="border-t border-slate-200 pt-4">
+              <div className={isAdmin ? 'border-t border-slate-200 pt-4' : ''}>
                 <div>
                   <label className="text-sm font-semibold text-slate-700">Speed ({rate}x)</label>
                   <input type="range" min="0.5" max="1.5" step="0.1" value={rate} onChange={e => setRate(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-2"/>
