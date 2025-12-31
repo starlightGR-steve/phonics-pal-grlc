@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Volume2, Settings, X, Mic, Play, Square, Trash2, Zap, GraduationCap, LayoutGrid, Layers, ChevronLeft, ChevronRight, Wand2, Loader2, Cloud, HardDrive, Lock } from 'lucide-react';
+import { Volume2, Settings, X, Mic, Play, Square, Trash2, Zap, GraduationCap, LayoutGrid, Layers, ChevronLeft, ChevronRight, Wand2, Loader2, Lock } from 'lucide-react';
 import { uploadAudioToFirebase, getAudioURLFromFirebase, deleteAudioFromFirebase, listAllAudioFiles } from './firebaseStorage';
 
 // --- DATA CONSTANTS ---
@@ -228,58 +228,6 @@ const createWavBlob = (pcm16Buffer, sampleRate = 24000) => {
     return new Blob([view], { type: 'audio/wav' });
 };
 
-// --- INDEXED DB UTILS ---
-const DB_NAME = 'PhonicsAudioDB';
-const STORE_NAME = 'audio_store';
-const DB_VERSION = 1;
-
-const initDB = () => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-  });
-};
-
-const saveAudioBlob = async (id, blob) => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.put(blob, id);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-};
-
-const getAudioBlob = async (id) => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.get(id);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-};
-
-const deleteAudioBlob = async (id) => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.delete(id);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-};
-
 const App = () => {
   // -- State --
   const [isPlaying, setIsPlaying] = useState(null);
@@ -293,7 +241,6 @@ const App = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'stack'
   const [stackIndex, setStackIndex] = useState(0);
-  const [useFirebase, setUseFirebase] = useState(true); // Toggle between Firebase and IndexedDB
   const [isAdmin, setIsAdmin] = useState(false); // Teacher mode
 
   // Audio Recording State - Now supporting string IDs
@@ -327,45 +274,25 @@ const App = () => {
     }
   }, []);
 
-  // -- Init Custom Audio --
+  // -- Init Custom Audio from Firebase --
   useEffect(() => {
     const loadCustomAudio = async () => {
       try {
-        if (useFirebase) {
-          // Load from Firebase Storage
-          const fileIds = await listAllAudioFiles();
-          const newRecordings = {};
-          for (const id of fileIds) {
-            const url = await getAudioURLFromFirebase(id);
-            if (url) {
-              newRecordings[id] = url;
-            }
+        const fileIds = await listAllAudioFiles();
+        const newRecordings = {};
+        for (const id of fileIds) {
+          const url = await getAudioURLFromFirebase(id);
+          if (url) {
+            newRecordings[id] = url;
           }
-          setCustomRecordings(newRecordings);
-        } else {
-          // Load from IndexedDB
-          const db = await initDB();
-          const transaction = db.transaction(STORE_NAME, 'readonly');
-          const store = transaction.objectStore(STORE_NAME);
-          const request = store.getAllKeys();
-          request.onsuccess = async () => {
-            const keys = request.result;
-            const newRecordings = {};
-            for (const key of keys) {
-               const blob = await getAudioBlob(key);
-               if (blob) {
-                 newRecordings[key] = URL.createObjectURL(blob);
-               }
-            }
-            setCustomRecordings(newRecordings);
-          };
         }
+        setCustomRecordings(newRecordings);
       } catch (err) {
-        console.error("Error loading audio", err);
+        console.error("Error loading audio from Firebase", err);
       }
     };
     loadCustomAudio();
-  }, [useFirebase]);
+  }, []);
 
   // -- Filter Logic --
   const filteredData = useMemo(() => {
@@ -432,16 +359,8 @@ const App = () => {
         
         const wavBlob = createWavBlob(bytes.buffer, 24000);
 
-        let url;
-        if (useFirebase) {
-          // Upload to Firebase Storage
-          url = await uploadAudioToFirebase(targetId, wavBlob);
-        } else {
-          // Save to IndexedDB
-          await saveAudioBlob(targetId, wavBlob);
-          url = URL.createObjectURL(wavBlob);
-        }
-
+        // Upload to Firebase Storage
+        const url = await uploadAudioToFirebase(targetId, wavBlob);
         setCustomRecordings(prev => ({ ...prev, [targetId]: url }));
 
         const audio = new Audio(url);
@@ -470,20 +389,13 @@ const App = () => {
       mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
 
-        if (useFirebase) {
-          // Upload to Firebase Storage
-          try {
-            const url = await uploadAudioToFirebase(targetId, blob);
-            setCustomRecordings(prev => ({ ...prev, [targetId]: url }));
-          } catch (error) {
-            console.error("Failed to upload to Firebase:", error);
-            alert("Failed to save recording to cloud. Please try again.");
-          }
-        } else {
-          // Save to IndexedDB
-          await saveAudioBlob(targetId, blob);
-          const url = URL.createObjectURL(blob);
+        // Upload to Firebase Storage
+        try {
+          const url = await uploadAudioToFirebase(targetId, blob);
           setCustomRecordings(prev => ({ ...prev, [targetId]: url }));
+        } catch (error) {
+          console.error("Failed to upload to Firebase:", error);
+          alert("Failed to save recording to cloud. Please try again.");
         }
 
         stream.getTracks().forEach(track => track.stop());
@@ -510,13 +422,8 @@ const App = () => {
 
   const deleteRecording = async (id) => {
     try {
-      if (useFirebase) {
-        // Delete from Firebase Storage
-        await deleteAudioFromFirebase(id);
-      } else {
-        // Delete from IndexedDB
-        await deleteAudioBlob(id);
-      }
+      // Delete from Firebase Storage
+      await deleteAudioFromFirebase(id);
 
       setCustomRecordings(prev => {
         const next = { ...prev };
@@ -827,43 +734,7 @@ const App = () => {
               <button onClick={() => setShowSettings(false)}><X className="w-5 h-5 text-slate-400" /></button>
             </div>
             <div className="space-y-4">
-              {/* Storage Location - ONLY SHOW IN TEACHER MODE */}
-              {isAdmin && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-3 block">Storage Location</label>
-                  <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
-                    <button
-                      onClick={() => setUseFirebase(false)}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                        !useFirebase
-                          ? 'bg-slate-700 text-white shadow-md'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      <HardDrive className="w-4 h-4" />
-                      Local
-                    </button>
-                    <button
-                      onClick={() => setUseFirebase(true)}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                        useFirebase
-                          ? 'bg-indigo-600 text-white shadow-md'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      <Cloud className="w-4 h-4" />
-                      Cloud
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    {useFirebase
-                      ? 'Audio saved to Firebase Storage (accessible across devices)'
-                      : 'Audio saved locally in your browser (this device only)'}
-                  </p>
-                </div>
-              )}
-
-              <div className={isAdmin ? 'border-t border-slate-200 pt-4' : ''}>
+              <div>
                 <div>
                   <label className="text-sm font-semibold text-slate-700">Speed ({rate}x)</label>
                   <input type="range" min="0.5" max="1.5" step="0.1" value={rate} onChange={e => setRate(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-2"/>
