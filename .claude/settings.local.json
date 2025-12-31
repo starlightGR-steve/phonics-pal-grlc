@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Firebase Storage integration for cloud audio hosting\n\n- Install Firebase SDK \\(firebase ^12.7.0\\)\n- Create Firebase configuration and Storage helper functions\n- Add cloud/local storage toggle in Settings\n- Integrate Firebase Storage for AI-generated and recorded audio\n- Update audio upload, download, and delete logic to support both Firebase and IndexedDB\n- Add FIREBASE_SETUP.md with configuration instructions\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run build:*)",
+      "Bash(git remote add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git remote set-url:*)"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Upload Test</title>
+</head>
+<body>
+    <h1>Firebase Storage Upload Test</h1>
+    <button id="testBtn">Test Upload</button>
+    <div id="output"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB27UQ6rFkLYIbUEwjAf1kWCWcwemEwf_A",
+            authDomain: "phonicspal-tcb.firebaseapp.com",
+            projectId: "phonicspal-tcb",
+            storageBucket: "phonicspal-tcb.firebasestorage.app",
+            messagingSenderId: "143159830132",
+            appId: "1:143159830132:web:34f0670433f3e8c7299321"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        const output = document.getElementById('output');
+
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            output.innerHTML = 'Testing upload...<br>';
+
+            try {
+                // Create test blob
+                const testBlob = new Blob(['test audio data'], { type: 'audio/webm' });
+
+                // Upload to Firebase
+                const storageRef = ref(storage, 'audio/test-upload.webm');
+                output.innerHTML += 'Uploading to Firebase...<br>';
+
+                await uploadBytes(storageRef, testBlob);
+                output.innerHTML += '✅ Upload successful!<br>';
+
+                const downloadURL = await getDownloadURL(storageRef);
+                output.innerHTML += `✅ Download URL: ${downloadURL}<br>`;
+
+            } catch (error) {
+                output.innerHTML += `❌ Error: ${error.code}<br>`;
+                output.innerHTML += `Message: ${error.message}<br>`;
+                console.error('Full error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
