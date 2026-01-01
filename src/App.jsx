@@ -441,11 +441,17 @@ const App = () => {
 
   // -- Playback Logic --
   const handleCardClick = (item) => {
+    console.log('Card clicked:', item.id, 'viewMode:', viewMode, 'isAdmin:', isAdmin);
+
+    // If clicking the same card that's already open and playing, just stop the sound
     if (activeCard?.id === item.id && isPlaying === item.id) {
       window.speechSynthesis.cancel();
       setIsPlaying(null);
-      return;
+      return; // Keep the modal open, just stop playing
     }
+
+    // Otherwise, open the card and play its sound
+    console.log('Setting activeCard to:', item.id);
     setActiveCard(item);
     playAudioGeneric(item.id, item.voiceOver); // Auto-play main sound
   };
@@ -841,6 +847,10 @@ const App = () => {
       </main>
 
       {/* --- Active Card Overlay (Grid Mode Only) --- */}
+      {(() => {
+        console.log('Modal render check - activeCard:', activeCard?.id, 'viewMode:', viewMode, 'should render:', !!(activeCard && viewMode === 'grid'));
+        return null;
+      })()}
       {activeCard && viewMode === 'grid' && (
         <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center pointer-events-none">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm pointer-events-auto transition-opacity" onClick={closeCard} />
