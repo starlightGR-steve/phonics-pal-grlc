@@ -512,7 +512,6 @@ const App = () => {
     { id: 'silent_e', label: 'Silent E' },
     { id: 'vowel_team', label: 'Vowel Teams' },
     { id: 'r_controlled', label: 'R-Controlled' },
-    { id: 'diphthong', label: 'Diphthongs' },
     { id: 'silent', label: 'Silent/Special' },
     { id: 'y_vowel', label: 'Y as Vowel' },
     { id: 'adv_vowel', label: 'Adv. Vowels' },
@@ -769,7 +768,7 @@ const App = () => {
                 let textColor = 'text-slate-700';
                 let badgeColor = 'bg-slate-100 text-slate-500';
 
-                if (item.type.includes('vowel') || item.type === 'diphthong' || item.type === 'adv_vowel') {
+                if (item.type.includes('vowel') || item.type === 'adv_vowel') {
                     borderColor = 'border-red-200'; textColor = 'text-red-600'; badgeColor = 'bg-red-100 text-red-600';
                 } else if (item.type.includes('consonant')) {
                     borderColor = 'border-blue-200'; textColor = 'text-blue-600'; badgeColor = 'bg-blue-100 text-blue-600';
