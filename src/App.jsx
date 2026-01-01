@@ -245,6 +245,7 @@ const App = () => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'stack'
   const [stackIndex, setStackIndex] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false); // Teacher mode
+  const [useFirebase, setUseFirebase] = useState(true); // Cloud storage toggle
 
   // Audio Recording State - Now supporting string IDs
   const [recordingActiveId, setRecordingActiveId] = useState(null);
