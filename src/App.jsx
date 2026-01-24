@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Volume2, Settings, X, Mic, Play, Square, Trash2, Zap, GraduationCap, LayoutGrid, Layers, ChevronLeft, ChevronRight, Wand2, Loader2, Lock } from 'lucide-react';
+import { Volume2, Settings, X, Mic, Play, Square, Trash2, Zap, GraduationCap, LayoutGrid, Layers, ChevronLeft, ChevronRight, ChevronDown, Wand2, Loader2, Lock } from 'lucide-react';
 import { uploadAudioToFirebase, getAudioURLFromFirebase, deleteAudioFromFirebase, listAllAudioFiles } from './firebaseStorage';
 
 // --- DATA CONSTANTS ---
@@ -257,9 +257,10 @@ const App = () => {
   const [voices, setVoices] = useState([]);
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'stack'
+  const [viewMode, setViewMode] = useState('stack'); // 'grid' or 'stack'
   const [stackIndex, setStackIndex] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false); // Teacher mode
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false); // Category menu
   const [useFirebase, setUseFirebase] = useState(true); // Cloud storage toggle
 
   // Audio Recording State - Now supporting string IDs
@@ -726,22 +727,40 @@ const App = () => {
           </div>
         </div>
 
-        {/* Categories Scrollable */}
+        {/* Categories Dropdown */}
         <div className="max-w-7xl mx-auto px-4 py-2 border-t border-slate-100">
-          <div className="flex flex-wrap gap-2 pb-1">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryChange(cat.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-colors whitespace-nowrap ${
-                  selectedCategory === cat.id 
-                  ? 'bg-slate-800 text-white' 
-                  : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+          <div className="relative inline-block">
+            <button
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <span>Categories:</span>
+              <span className="text-indigo-600">{categories.find(c => c.id === selectedCategory)?.label || 'All Cards'}</span>
+              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showCategoryDropdown && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowCategoryDropdown(false)} />
+                <div className="absolute left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 min-w-[200px] max-h-[60vh] overflow-y-auto">
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        handleCategoryChange(cat.id);
+                        setShowCategoryDropdown(false);
+                      }}
+                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                        selectedCategory === cat.id
+                        ? 'bg-indigo-50 text-indigo-700'
+                        : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
