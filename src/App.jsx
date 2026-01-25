@@ -683,10 +683,10 @@ const App = () => {
   )};
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 pb-20">
+    <div className="h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 overflow-hidden flex flex-col">
 
       {/* --- Header --- */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+      <header className="bg-white border-b border-slate-200 z-20 shadow-sm shrink-0">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-200 shadow-md">
@@ -719,7 +719,7 @@ const App = () => {
       </header>
 
       {/* Categories Button & Expandable Menu - Centered above cards */}
-      <div className="w-full flex justify-center px-4 py-3">
+      <div className="w-full flex justify-center px-4 py-2 md:py-3 shrink-0">
         <div className="relative">
           {/* Main Category Button */}
           <button
@@ -815,11 +815,11 @@ const App = () => {
       )}
 
       {/* --- Main Content Area --- */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="flex-1 max-w-7xl mx-auto px-4 py-4 w-full flex flex-col items-center justify-center overflow-hidden">
         
         {/* GRID VIEW */}
         {viewMode === 'grid' && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 max-h-[70vh] overflow-y-auto w-full p-2">
             {filteredData.map((item) => {
                 let borderColor = 'border-slate-200';
                 let textColor = 'text-slate-700';
@@ -855,12 +855,12 @@ const App = () => {
 
         {/* STACK VIEW */}
         {viewMode === 'stack' && filteredData.length > 0 && (
-            <div className="flex flex-col items-center justify-center max-w-lg mx-auto h-full">
-                <div className="bg-white rounded-3xl shadow-xl w-full p-8 text-center relative flex flex-col justify-between min-h-[500px]">
+            <div className="flex flex-col items-center justify-center max-w-lg mx-auto w-full flex-1">
+                <div className="bg-white rounded-3xl shadow-xl w-full p-6 md:p-8 text-center relative flex flex-col justify-between max-h-[50vh] min-h-[40vh] overflow-hidden">
                     
                     {renderCardContent(filteredData[stackIndex])}
 
-                    <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 mt-8 -mx-8 -mb-8 rounded-b-3xl">
+                    <div className="p-3 md:p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 mt-auto -mx-6 md:-mx-8 -mb-6 md:-mb-8 rounded-b-3xl">
                         <button
                             onClick={() => playAudioGeneric(filteredData[stackIndex].id, filteredData[stackIndex].voiceOver)}
                             className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
@@ -871,7 +871,7 @@ const App = () => {
                 </div>
 
                 {/* Stack Navigation Controls */}
-                <div className="flex items-center justify-between w-full mt-8 px-4">
+                <div className="flex items-center justify-between w-full mt-4 md:mt-6 px-4">
                     <button 
                         onClick={handlePrev}
                         disabled={stackIndex === 0}
@@ -892,7 +892,7 @@ const App = () => {
                         <ChevronRight className="w-6 h-6" />
                     </button>
                 </div>
-                <p className="text-xs text-slate-400 mt-4">Tip: Use Left/Right arrow keys to flip</p>
+                <p className="text-xs text-slate-400 mt-2 md:mt-4">Tip: Use Left/Right arrow keys to flip</p>
             </div>
         )}
       </main>
