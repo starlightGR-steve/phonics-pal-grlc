@@ -250,7 +250,6 @@ const App = () => {
   // -- State --
   const [isPlaying, setIsPlaying] = useState(null);
   const [activeCard, setActiveCard] = useState(null);
-  const [lessonMode, setLessonMode] = useState(true);
   const [rate, setRate] = useState(0.9);
   const [pitch, setPitch] = useState(1.0);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -489,11 +488,7 @@ const App = () => {
     // 2. Fallback to Browser TTS
     setIsPlaying(targetId);
     let textToSpeak = textFallback;
-    if (!lessonMode && !targetId.includes('_why')) {
-        // Quick Mode Logic (Only for main card)
-        textToSpeak = textFallback.split('.')[0]; 
-    }
-    
+
     if (textToSpeak) {
         textToSpeak = textToSpeak.replace(/\//g, '').replace(/—/g, '... ');
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -506,7 +501,7 @@ const App = () => {
     } else {
         setIsPlaying(null);
     }
-  }, [lessonMode, rate, pitch, voices, selectedVoiceIndex, customRecordings]);
+  }, [rate, pitch, voices, selectedVoiceIndex, customRecordings]);
 
   const closeCard = () => {
     window.speechSynthesis.cancel();
@@ -715,12 +710,6 @@ const App = () => {
                 </button>
             </div>
 
-            {/* Mode Toggle (Compact) */}
-            <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1 hidden sm:flex">
-                <button onClick={() => setLessonMode(false)} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${!lessonMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>Quick</button>
-                <button onClick={() => setLessonMode(true)} className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${lessonMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>Lesson</button>
-            </div>
-            
             <button onClick={() => setShowSettings(true)} className="p-2 hover:bg-slate-100 rounded-full">
                 <Settings className="w-6 h-6 text-slate-600" />
             </button>
@@ -924,7 +913,7 @@ const App = () => {
                 onClick={() => playAudioGeneric(activeCard.id, activeCard.voiceOver)}
                 className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
               >
-                {isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : `Play ${lessonMode ? 'Lesson' : 'Sound'}`}</>}
+                {isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : 'Play Sound'}</>}
               </button>
             </div>
           </div>
