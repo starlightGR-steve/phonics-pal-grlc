@@ -532,9 +532,9 @@ const App = () => {
     { id: 'silent_e', label: 'Silent E' },
     { id: 'vowel_team', label: 'Vowel Teams' },
     { id: 'r_controlled', label: 'R-Controlled' },
-    { id: 'silent', label: 'Silent/Special' },
+    { id: 'silent', label: 'Silent Letters' },
     { id: 'y_vowel', label: 'Y as Vowel' },
-    { id: 'adv_vowel', label: 'Adv. Vowels' },
+    { id: 'adv_vowel', label: 'Advanced' },
     { id: 'suffix', label: 'Suffixes' },
     { id: 'ending', label: 'Endings' },
     { id: 'rare', label: 'Rare Patterns' },
@@ -727,43 +727,73 @@ const App = () => {
           </div>
         </div>
 
-        {/* Categories Dropdown */}
-        <div className="max-w-7xl mx-auto px-4 py-2 border-t border-slate-100">
-          <div className="relative inline-block">
-            <button
-              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-              <span>Categories:</span>
-              <span className="text-indigo-600">{categories.find(c => c.id === selectedCategory)?.label || 'All Cards'}</span>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
-            </button>
+      </header>
+
+      {/* Categories Button & Expandable Menu - Centered above cards */}
+      <div className="w-full flex justify-center px-4 py-3">
+        <div className="relative">
+          {/* Main Category Button */}
+          <button
+            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+            className="flex items-center gap-3 px-6 py-3 bg-white rounded-full font-bold text-lg
+              shadow-lg border-2 border-slate-200 transition-all duration-300 transform
+              hover:scale-105 hover:shadow-xl hover:border-indigo-300 active:scale-95"
+          >
+            <span className="text-indigo-600">{categories.find(c => c.id === selectedCategory)?.label || 'All Cards'}</span>
+            <div className={`
+              w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center
+              transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}
+            `}>
+              <ChevronDown className="w-5 h-5 text-indigo-600" />
+            </div>
+          </button>
+
+          {/* Expandable Category Grid */}
+          <div className={`
+            absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50
+            transition-all duration-300 ease-out origin-top
+            ${showCategoryDropdown
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}
+          `}>
+            {/* Backdrop */}
             {showCategoryDropdown && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowCategoryDropdown(false)} />
-                <div className="absolute left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 min-w-[200px] max-h-[60vh] overflow-y-auto">
-                  {categories.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        handleCategoryChange(cat.id);
-                        setShowCategoryDropdown(false);
-                      }}
-                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
-                        selectedCategory === cat.id
-                        ? 'bg-indigo-50 text-indigo-700'
-                        : 'text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </>
+              <div className="fixed inset-0 z-40" onClick={() => setShowCategoryDropdown(false)} />
             )}
+
+            {/* Menu Panel */}
+            <div className="relative z-50 bg-white rounded-3xl shadow-2xl border-2 border-slate-200 p-4 w-[320px] sm:w-[380px]">
+              {/* Arrow pointer */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white border-l-2 border-t-2 border-slate-200 rotate-45" />
+
+              {/* Category Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 relative">
+                {categories.map((cat, idx) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      handleCategoryChange(cat.id);
+                      setShowCategoryDropdown(false);
+                    }}
+                    style={{ animationDelay: `${idx * 30}ms` }}
+                    className={`
+                      px-3 py-3 rounded-xl font-semibold text-sm
+                      transition-all duration-200 transform hover:scale-105 active:scale-95
+                      ${showCategoryDropdown ? 'animate-in fade-in zoom-in' : ''}
+                      ${selectedCategory === cat.id
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700'
+                      }
+                    `}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* --- Settings Modal --- */}
       {showSettings && (
