@@ -306,11 +306,34 @@ const App = () => {
           }
         }
         setCustomRecordings(newRecordings);
+        console.log("✅ Loaded", Object.keys(newRecordings).length, "custom audio files from Firebase");
       } catch (err) {
-        console.error("Error loading audio from Firebase", err);
+        console.error("❌ Error loading audio from Firebase:", err);
       }
     };
     loadCustomAudio();
+  }, []);
+
+  // -- Refresh URLs every 6 hours to prevent token expiry --
+  useEffect(() => {
+    const refreshUrls = async () => {
+      try {
+        const fileIds = await listAllAudioFiles();
+        const newRecordings = {};
+        for (const id of fileIds) {
+          const url = await getAudioURLFromFirebase(id);
+          if (url) newRecordings[id] = url;
+        }
+        setCustomRecordings(newRecordings);
+        console.log("🔄 Audio URLs refreshed at", new Date().toLocaleTimeString());
+      } catch (err) {
+        console.error("❌ Error refreshing audio URLs:", err);
+      }
+    };
+
+    // Refresh every 6 hours (21600000 ms)
+    const interval = setInterval(refreshUrls, 21600000);
+    return () => clearInterval(interval);
   }, []);
 
   // -- Filter Logic --
@@ -470,17 +493,37 @@ const App = () => {
   };
 
   // Generic Player (Handles both Main Card and "Why" sections)
-  const playAudioGeneric = useCallback((targetId, textFallback) => {
+  const playAudioGeneric = useCallback(async (targetId, textFallback) => {
     if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-    
+
     // 1. Custom/AI Recording Exists?
     if (customRecordings[targetId]) {
       setIsPlaying(targetId);
       const audio = new Audio(customRecordings[targetId]);
       audio.onended = () => setIsPlaying(null);
-      audio.play().catch(e => {
-        console.error("Audio play failed", e);
-        setIsPlaying(null);
+
+      audio.play().catch(async (e) => {
+        console.warn("⚠️ Audio URL failed, refreshing URL for", targetId, e);
+
+        // Try to fetch a fresh URL
+        try {
+          const freshUrl = await getAudioURLFromFirebase(targetId);
+          if (freshUrl) {
+            setCustomRecordings(prev => ({ ...prev, [targetId]: freshUrl }));
+            const retryAudio = new Audio(freshUrl);
+            retryAudio.onended = () => setIsPlaying(null);
+            retryAudio.play().catch(() => {
+              console.error("❌ Retry failed, falling back to TTS");
+              setIsPlaying(null);
+            });
+          } else {
+            console.error("❌ No fresh URL available, audio might be deleted");
+            setIsPlaying(null);
+          }
+        } catch (refreshErr) {
+          console.error("❌ Failed to refresh URL:", refreshErr);
+          setIsPlaying(null);
+        }
       });
       return;
     }
