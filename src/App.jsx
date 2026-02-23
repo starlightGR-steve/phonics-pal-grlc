@@ -28,7 +28,7 @@ const PHONIC_DATA = [
   { id: 'n', letter: 'n', word: 'net', image: '🥅', type: 'consonant', voiceOver: "N says n. Net. N—et. N." },
   { id: 'p', letter: 'p', word: 'pig', image: '🐷', type: 'consonant', voiceOver: "P says p. Pig. P—ig. P." },
   {
-    id: 'qu', letter: 'qu', word: 'queen', image: '👑', type: 'consonant',
+    id: 'qu', letter: 'q', word: 'queen', image: '👑', type: 'consonant',
     why: 'Q usually comes before the letter u to say /kw/.',
     voiceOver: "Qu says kw. Queen. Kw—een. Kw."
   },
@@ -125,6 +125,7 @@ const PHONIC_DATA = [
   { id: 'oa', letter: 'oa', word: 'boat', image: '⛵', type: 'vowel_team', voiceOver: "Oa says ō. Boat. B—oat. Ō." },
   { id: 'oe', letter: 'oe', word: 'toe', image: '🦶', type: 'vowel_team', voiceOver: "Oe says ō. Toe. T—oe. Ō." },
   { id: 'ow_snow', letter: 'ow', word: 'snow', image: '❄️', type: 'vowel_team', voiceOver: "Ow says ō. Snow. Sn—ow. Ō." },
+  { id: 'ow_cow', letter: 'ow', word: 'cow', image: '🐄', type: 'vowel_team', voiceOver: "Ow says ow. Cow. C—ow. Ow." },
   { id: 'ie_pie', letter: 'ie', word: 'pie', image: '🥧', type: 'vowel_team', voiceOver: "Ie says ī. Pie. P—ie. Ī." },
   { id: 'ie_field', letter: 'ie', word: 'field', image: '🌱', type: 'vowel_team', why: 'Ie can also say /ē/.', voiceOver: "Ie says ē. Field. F—ield. Ē." },
   { id: 'igh', letter: 'igh', word: 'light', image: '💡', type: 'vowel_team', voiceOver: "Igh says ī. Light. L—ight. Ī." },
@@ -136,7 +137,6 @@ const PHONIC_DATA = [
   { id: 'oy', letter: 'oy', word: 'boy', image: '👦', type: 'vowel_team', voiceOver: "Oy says oi. Boy. B—oy. Oi." },
   { id: 'ou_house', letter: 'ou', word: 'house', image: '🏠', type: 'vowel_team', why: 'Ou can say different sounds; this card is for /ow/.', voiceOver: "Ou says ow. House. H—ouse. Ow." },
   { id: 'ou_soup', letter: 'ou', word: 'soup', image: '🍲', type: 'vowel_team', why: 'Ou can also say /oo/.', voiceOver: "Ou says oo. Soup. S—oup. Oo." },
-  { id: 'ow_cow', letter: 'ow', word: 'cow', image: '🐄', type: 'vowel_team', voiceOver: "Ow says ow. Cow. C—ow. Ow." },
   { id: 'au', letter: 'au', word: 'autumn', image: '🍂', type: 'vowel_team', voiceOver: "Au says aw. Autumn. Au—tumn. Aw." },
   { id: 'aw', letter: 'aw', word: 'draw', image: '✏️', type: 'vowel_team', voiceOver: "Aw says aw. Draw. Dr—aw. Aw." },
 
@@ -154,9 +154,9 @@ const PHONIC_DATA = [
   // 🔕 SECTION 9 — Silent Letters & Special Patterns
   { id: 'kn', letter: 'kn', word: 'knee', image: '🦵', type: 'silent', why: 'The k is silent. Kn says /n/.', voiceOver: "Kn says n. Knee. N—ee. N." },
   { id: 'wr', letter: 'wr', word: 'write', image: '✍️', type: 'silent', why: 'The w is silent. Wr says /r/.', voiceOver: "Wr says r. Write. R—ite. R." },
-  { id: 'gn', letter: 'gn', word: 'gnome', image: '🪆', type: 'silent', why: 'The g is silent. Gn says /n/.', voiceOver: "Gn says n. Gnome. N—ome. N." },
+  { id: 'gn', letter: 'gn', word: 'gnome', image: '🧙‍♂️', type: 'silent', why: 'The g is silent. Gn says /n/.', voiceOver: "Gn says n. Gnome. N—ome. N." },
   { id: 'mb', letter: 'mb', word: 'lamb', image: '🐑', type: 'silent', why: 'The b is silent at the end. Mb says /m/.', voiceOver: "Mb says m. Lamb. L—am. M." },
-  { id: 'tch', letter: 'tch', word: 'match', image: '🕯️', type: 'silent', why: 'Tch says /ch/ after a short vowel.', voiceOver: "Tch says ch. Match. M—atch. Ch." },
+  { id: 'tch', letter: 'tch', word: 'watch', image: '⌚', type: 'silent', why: 'Tch says /ch/ after a short vowel.', voiceOver: "Tch says ch. Watch. Wa—tch. Ch." },
   { id: 'dge', letter: 'dge', word: 'bridge', image: '🌉', type: 'silent', why: 'Dge says /j/ at the end after a short vowel.', voiceOver: "Dge says j. Bridge. Br—idge. J." },
 
   // 💎 SECTION 11 — Advanced Vowel Teams
@@ -165,7 +165,7 @@ const PHONIC_DATA = [
   { id: 'eigh', letter: 'eigh', word: 'eight', image: '8️⃣', type: 'adv_vowel', voiceOver: "Eigh says ā. Eight. Ā—t. Ā." },
   { id: 'ey_they', letter: 'ey', word: 'they', image: '👫', type: 'adv_vowel', voiceOver: "Ey says ā. They. Th—ey. Ā." },
   { id: 'ey_key', letter: 'ey', word: 'key', image: '🔑', type: 'adv_vowel', voiceOver: "Ey says ē. Key. K—ey. Ē." },
-  { id: 'eu', letter: 'eu', word: 'few', image: '🔢', type: 'adv_vowel', voiceOver: "Eu says yoo. Few. F—ew. Yoo." },
+  { id: 'ew', letter: 'ew', word: 'stew', image: '🍲', type: 'adv_vowel', why: 'Ew usually says /yoo/.', voiceOver: "Ew says yoo. Stew. St—ew. Yoo." },
   { id: 'eau', letter: 'eau', word: 'beau', image: '💐', type: 'adv_vowel', voiceOver: "Eau says ō. Beau. B—eau. Ō." },
   { id: 'ui_build', letter: 'ui', word: 'build', image: '🧱', type: 'adv_vowel', why: 'Ui sometimes says /ĭ/.', voiceOver: "Ui says ĭ. Build. B—uild. Ĭ." },
   {
@@ -270,6 +270,10 @@ const App = () => {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+  const currentAudioRef = useRef(null);
+  const [audioLoading, setAudioLoading] = useState(true); // true until Firebase recordings are loaded
+  const audioLoadingRef = useRef(true); // ref version so playAudioGeneric can read without re-render
+  const pendingPlayRef = useRef(null); // { id, voiceOver } queued while loading
 
   // -- Check for Teacher Mode --
   useEffect(() => {
@@ -296,19 +300,46 @@ const App = () => {
   // -- Init Custom Audio from Firebase --
   useEffect(() => {
     const loadCustomAudio = async () => {
+      // Declare outside try so it's accessible in finally
+      const recordings = {};
       try {
         const fileIds = await listAllAudioFiles();
-        const newRecordings = {};
-        for (const id of fileIds) {
-          const url = await getAudioURLFromFirebase(id);
-          if (url) {
-            newRecordings[id] = url;
-          }
+        // Fetch all URLs in parallel instead of sequentially
+        const results = await Promise.all(
+          fileIds.map(async (id) => {
+            const url = await getAudioURLFromFirebase(id);
+            return { id, url };
+          })
+        );
+        for (const { id, url } of results) {
+          if (url) recordings[id] = url;
         }
-        setCustomRecordings(newRecordings);
-        console.log("✅ Loaded", Object.keys(newRecordings).length, "custom audio files from Firebase");
+        setCustomRecordings(recordings);
+        console.log("✅ Loaded", Object.keys(recordings).length, "custom audio files from Firebase");
       } catch (err) {
         console.error("❌ Error loading audio from Firebase:", err);
+      } finally {
+        audioLoadingRef.current = false;
+        setAudioLoading(false);
+
+        // Fire any queued play using `recordings` directly — avoids stale React state closure
+        if (pendingPlayRef.current) {
+          const { id } = pendingPlayRef.current;
+          pendingPlayRef.current = null;
+          if (recordings[id]) {
+            if (currentAudioRef.current) {
+              currentAudioRef.current.pause();
+              currentAudioRef.current = null;
+            }
+            window.speechSynthesis.cancel();
+            const audio = new Audio(recordings[id]);
+            currentAudioRef.current = audio;
+            setIsPlaying(id);
+            audio.onended = () => { setIsPlaying(null); currentAudioRef.current = null; };
+            audio.play().catch(() => { setIsPlaying(null); currentAudioRef.current = null; });
+          }
+          // No recording for this card → user can tap Play Sound for TTS
+        }
       }
     };
     loadCustomAudio();
@@ -319,9 +350,14 @@ const App = () => {
     const refreshUrls = async () => {
       try {
         const fileIds = await listAllAudioFiles();
+        const results = await Promise.all(
+          fileIds.map(async (id) => {
+            const url = await getAudioURLFromFirebase(id);
+            return { id, url };
+          })
+        );
         const newRecordings = {};
-        for (const id of fileIds) {
-          const url = await getAudioURLFromFirebase(id);
+        for (const { id, url } of results) {
           if (url) newRecordings[id] = url;
         }
         setCustomRecordings(newRecordings);
@@ -405,7 +441,18 @@ const App = () => {
         const url = await uploadAudioToFirebase(targetId, wavBlob);
         setCustomRecordings(prev => ({ ...prev, [targetId]: url }));
 
+        if (currentAudioRef.current) {
+          currentAudioRef.current.pause();
+          currentAudioRef.current = null;
+        }
+        if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
         const audio = new Audio(url);
+        currentAudioRef.current = audio;
+        audio.onended = () => {
+          setIsPlaying(null);
+          currentAudioRef.current = null;
+        };
+        setIsPlaying(targetId);
         audio.play();
 
     } catch (error) {
@@ -494,16 +541,34 @@ const App = () => {
 
   // Generic Player (Handles both Main Card and "Why" sections)
   const playAudioGeneric = useCallback(async (targetId, textFallback) => {
+    // If Firebase recordings haven't loaded yet, queue this request and wait
+    if (audioLoadingRef.current) {
+      pendingPlayRef.current = { id: targetId, voiceOver: textFallback };
+      console.log("⏳ Recordings still loading — queued play for", targetId);
+      return;
+    }
+
+    // Stop any currently playing audio
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
     if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+    setIsPlaying(null);
 
     // 1. Custom/AI Recording Exists?
     if (customRecordings[targetId]) {
       setIsPlaying(targetId);
       const audio = new Audio(customRecordings[targetId]);
-      audio.onended = () => setIsPlaying(null);
+      currentAudioRef.current = audio;
+      audio.onended = () => {
+        setIsPlaying(null);
+        currentAudioRef.current = null;
+      };
 
       audio.play().catch(async (e) => {
         console.warn("⚠️ Audio URL failed, refreshing URL for", targetId, e);
+        currentAudioRef.current = null;
 
         // Try to fetch a fresh URL
         try {
@@ -511,10 +576,15 @@ const App = () => {
           if (freshUrl) {
             setCustomRecordings(prev => ({ ...prev, [targetId]: freshUrl }));
             const retryAudio = new Audio(freshUrl);
-            retryAudio.onended = () => setIsPlaying(null);
+            currentAudioRef.current = retryAudio;
+            retryAudio.onended = () => {
+              setIsPlaying(null);
+              currentAudioRef.current = null;
+            };
             retryAudio.play().catch(() => {
               console.error("❌ Retry failed, falling back to TTS");
               setIsPlaying(null);
+              currentAudioRef.current = null;
             });
           } else {
             console.error("❌ No fresh URL available, audio might be deleted");
@@ -547,6 +617,10 @@ const App = () => {
   }, [rate, pitch, voices, selectedVoiceIndex, customRecordings]);
 
   const closeCard = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
     window.speechSynthesis.cancel();
     setIsPlaying(null);
     setActiveCard(null);
@@ -554,11 +628,21 @@ const App = () => {
   };
 
   const handleNext = () => {
-    if (stackIndex < filteredData.length - 1) setStackIndex(prev => prev + 1);
+    if (stackIndex < filteredData.length - 1) {
+      const newIndex = stackIndex + 1;
+      setStackIndex(newIndex);
+      const card = filteredData[newIndex];
+      if (card) playAudioGeneric(card.id, card.voiceOver);
+    }
   };
 
   const handlePrev = () => {
-    if (stackIndex > 0) setStackIndex(prev => prev - 1);
+    if (stackIndex > 0) {
+      const newIndex = stackIndex - 1;
+      setStackIndex(newIndex);
+      const card = filteredData[newIndex];
+      if (card) playAudioGeneric(card.id, card.voiceOver);
+    }
   };
 
   const categories = [
@@ -858,7 +942,7 @@ const App = () => {
       )}
 
       {/* --- Main Content Area --- */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-4 w-full flex flex-col items-center justify-center overflow-hidden">
+      <main className="flex-1 max-w-7xl mx-auto px-4 py-4 w-full flex flex-col items-center overflow-hidden min-h-0">
         
         {/* GRID VIEW */}
         {viewMode === 'grid' && (
@@ -898,36 +982,38 @@ const App = () => {
 
         {/* STACK VIEW */}
         {viewMode === 'stack' && filteredData.length > 0 && (
-            <div className="flex flex-col items-center justify-center max-w-lg mx-auto w-full flex-1">
-                <div className="bg-white rounded-3xl shadow-xl w-full p-6 md:p-8 text-center relative flex flex-col justify-between max-h-[50vh] min-h-[40vh] overflow-hidden">
-                    
-                    {renderCardContent(filteredData[stackIndex])}
+            <div className="flex flex-col items-center max-w-lg mx-auto w-full flex-1 min-h-0">
+                <div className="bg-white rounded-3xl shadow-xl w-full text-center relative flex flex-col overflow-hidden flex-1 min-h-0">
 
-                    <div className="p-3 md:p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 mt-auto -mx-6 md:-mx-8 -mb-6 md:-mb-8 rounded-b-3xl">
+                    <div className="p-6 md:p-8 flex-1 overflow-y-auto min-h-0">
+                        {renderCardContent(filteredData[stackIndex])}
+                    </div>
+
+                    <div className="p-3 md:p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 shrink-0 rounded-b-3xl">
                         <button
                             onClick={() => playAudioGeneric(filteredData[stackIndex].id, filteredData[stackIndex].voiceOver)}
                             className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
                         >
-                            {isPlaying === filteredData[stackIndex].id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> Play Sound</>}
+                            {audioLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Loading Audio...</> : isPlaying === filteredData[stackIndex].id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> Play Sound</>}
                         </button>
                     </div>
                 </div>
 
                 {/* Stack Navigation Controls */}
-                <div className="flex items-center justify-between w-full mt-4 md:mt-6 px-4">
-                    <button 
+                <div className="flex items-center justify-between w-full mt-4 md:mt-6 px-4 shrink-0">
+                    <button
                         onClick={handlePrev}
                         disabled={stackIndex === 0}
                         className="p-4 rounded-full bg-white shadow-md text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
-                    
+
                     <span className="font-bold text-slate-400 text-sm tracking-widest uppercase">
                         Card {stackIndex + 1} of {filteredData.length}
                     </span>
 
-                    <button 
+                    <button
                         onClick={handleNext}
                         disabled={stackIndex === filteredData.length - 1}
                         className="p-4 rounded-full bg-white shadow-md text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
@@ -935,7 +1021,7 @@ const App = () => {
                         <ChevronRight className="w-6 h-6" />
                     </button>
                 </div>
-                <p className="text-xs text-slate-400 mt-2 md:mt-4">Tip: Use Left/Right arrow keys to flip</p>
+                <p className="text-xs text-slate-400 mt-2 md:mt-4 shrink-0">Tip: Use Left/Right arrow keys to flip</p>
             </div>
         )}
       </main>
@@ -956,7 +1042,7 @@ const App = () => {
                 onClick={() => playAudioGeneric(activeCard.id, activeCard.voiceOver)}
                 className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
               >
-                {isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : 'Play Sound'}</>}
+                {audioLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Loading Audio...</> : isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : 'Play Sound'}</>}
               </button>
             </div>
           </div>
