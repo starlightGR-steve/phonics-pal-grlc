@@ -380,6 +380,7 @@ const App = () => {
 
   // -- Safe Category Switching --
   const handleCategoryChange = (catId) => {
+    stopAllAudio();
     setSelectedCategory(catId);
     setStackIndex(0); // Reset to prevent out-of-bounds errors
   };
@@ -525,17 +526,27 @@ const App = () => {
     }
   };
 
+  // -- Stop all audio (centralized helper) --
+  const stopAllAudio = useCallback(() => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+    setIsPlaying(null);
+  }, []);
+
   // -- Playback Logic --
   const handleCardClick = (item) => {
     // If clicking the same card that's already open and playing, just stop the sound
     if (activeCard?.id === item.id && isPlaying === item.id) {
-      window.speechSynthesis.cancel();
-      setIsPlaying(null);
+      stopAllAudio();
       return; // Keep the modal open, just stop playing
     }
 
     // Otherwise, open the card and play its sound
     setActiveCard(item);
+    stopAllAudio();
     playAudioGeneric(item.id, item.voiceOver); // Auto-play main sound
   };
 
@@ -617,18 +628,14 @@ const App = () => {
   }, [rate, pitch, voices, selectedVoiceIndex, customRecordings]);
 
   const closeCard = () => {
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-    }
-    window.speechSynthesis.cancel();
-    setIsPlaying(null);
+    stopAllAudio();
     setActiveCard(null);
     if (recordingActiveId) stopRecording();
   };
 
   const handleNext = () => {
     if (stackIndex < filteredData.length - 1) {
+      stopAllAudio();
       const newIndex = stackIndex + 1;
       setStackIndex(newIndex);
       const card = filteredData[newIndex];
@@ -638,6 +645,7 @@ const App = () => {
 
   const handlePrev = () => {
     if (stackIndex > 0) {
+      stopAllAudio();
       const newIndex = stackIndex - 1;
       setStackIndex(newIndex);
       const card = filteredData[newIndex];
