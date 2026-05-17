@@ -104,10 +104,10 @@ const PHONIC_DATA = [
   { id: 'e_e', letter: 'e_e', word: 'these', image: '👉', type: 'silent_e', why: 'Silent e makes e say /ē/.', voiceOver: "E-e says ē. These. Th—ese. Ē." },
   { id: 'i_e', letter: 'i_e', word: 'kite', image: '🪁', type: 'silent_e', why: 'Silent e makes i say /ī/.', voiceOver: "I-e says ī. Kite. K—ite. Ī." },
   { id: 'o_e', letter: 'o_e', word: 'nose', image: '👃', type: 'silent_e', why: 'Silent e makes o say /ō/.', voiceOver: "O-e says ō. Nose. N—ose. Ō." },
-  { id: 'u_e', letter: 'u_e', word: 'cube', image: '🧊', type: 'silent_e', why: 'Silent e makes u say /ū/.', voiceOver: "U-e says ū. Cube. C—ube. Ū." },
+  { id: 'u_e', letter: 'u_e', word: 'cube', image: '🧊', type: 'silent_e', why: 'Sometimes u starts with a /y/ sound and says /yoo/.', voiceOver: "U-e says ū. Cube. C—ube. Ū." },
   {
     id: 'u_yoo', letter: 'u_e', word: 'tune', image: '🎵', type: 'silent_e',
-    why: 'Sometimes u starts with a /y/ sound and says /yoo/.',
+    why: 'Silent e makes u say /ū/.',
     voiceOver: "U says yoo. Tune. T—une. Yoo."
   },
 
@@ -748,7 +748,7 @@ const App = () => {
             </div>
 
             {/* Big Letter */}
-            <div className={`text-8xl font-black tracking-tighter leading-none ${card.type.includes('vowel') || card.type === 'adv_vowel' ? 'text-red-500' : 'text-blue-600'}`}>
+            <div className="text-8xl font-black tracking-tighter leading-none text-indigo-600">
                 {card.letter.replace('_', '-')}
             </div>
         </div>
@@ -1012,7 +1012,7 @@ const App = () => {
                     <button
                         onClick={handlePrev}
                         disabled={stackIndex === 0}
-                        className="p-4 rounded-full bg-white shadow-md text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
+                        className="p-4 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
@@ -1024,7 +1024,7 @@ const App = () => {
                     <button
                         onClick={handleNext}
                         disabled={stackIndex === filteredData.length - 1}
-                        className="p-4 rounded-full bg-white shadow-md text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
+                        className="p-4 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all"
                     >
                         <ChevronRight className="w-6 h-6" />
                     </button>
