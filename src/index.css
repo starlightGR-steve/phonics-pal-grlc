@@ -1,13 +1,59 @@
+/* tokens.css begins with the Quicksand @import, and CSS requires every @import
+   to precede all other rules — so the kit tokens MUST be imported before
+   tailwindcss, otherwise the font @import ends up mid-stylesheet and browsers
+   ignore it (Quicksand would silently fail to load). */
+@import "../playful-scholar-kit/tokens.css";
 @import "tailwindcss";
 
+/* =====================================================================
+   Tailwind v4 theme — alias the Playful Scholar kit tokens to Tailwind
+   utilities. tokens.css (in the playful-scholar-kit submodule) is the
+   SINGLE SOURCE OF TRUTH. To change a color globally, edit tokens.css,
+   not here. These aliases just expose the kit CSS variables as Tailwind
+   classes (e.g. bg-ps-blue, text-phonics-vowels).
+   ===================================================================== */
 @theme {
-  --color-indigo-50: #eef3fa;
-  --color-indigo-100: #dce6f3;
-  --color-indigo-200: #b7cbe7;
-  --color-indigo-300: #87a8d5;
-  --color-indigo-400: #5683c2;
-  --color-indigo-500: #4170b7;
-  --color-indigo-600: #355caa;
-  --color-indigo-700: #2b488a;
-  --color-indigo-800: #21376a;
+  /* Typography — Quicksand (kit loads weights 500 & 700 only; 400 is an
+     intentional tripwire and is never loaded). */
+  --font-sans: 'Quicksand', sans-serif;
+
+  /* Core identity */
+  --color-ps-blue:      var(--ps-blue);
+  --color-ps-teal:      var(--ps-teal);
+  --color-ps-orange:    var(--ps-orange);
+  --color-ps-green:     var(--ps-green);
+  --color-ps-red:       var(--ps-red);
+  --color-ps-dark-teal: var(--ps-dark-teal);
+  --color-ps-navy:      var(--ps-navy);
+  --color-ps-bg:        var(--ps-bg);
+  --color-ps-text:      var(--ps-text);
+  --color-ps-border:    var(--ps-border);
+
+  /* Header */
+  --color-header-bg:     var(--header-bg);
+  --color-header-border: var(--header-border);
+
+  /* Phonics category colors (big card letter) */
+  --color-phonics-vowels:     var(--phonics-vowels);
+  --color-phonics-consonants: var(--phonics-consonants);
+  --color-phonics-digraphs:   var(--phonics-digraphs);
+  --color-phonics-suffixes:   var(--phonics-suffixes);
+
+  /* Small-text safe variants & feedback */
+  --color-secondary-semi-dark: var(--secondary-semi-dark);
+  --color-accent-semi-dark:    var(--accent-semi-dark);
+  --color-success-text:        var(--success-text);
+  --color-success-bg:          var(--success-bg);
+  --color-success-border:      var(--success-border);
+  --color-danger-text:         var(--danger-text);
+  --color-danger-bg:           var(--danger-bg);
+  --color-danger-border:       var(--danger-border);
+  --color-neutral:             var(--neutral);
+
+  /* Subtle surfaces */
+  --color-surface-tint:     var(--surface-tint);
+  --color-teal-ultra-light: var(--teal-ultra-light);
+  --color-teal-light:       var(--teal-light);
+  --color-orange-light:     var(--orange-light);
+  --color-blue-light:       var(--blue-light);
 }

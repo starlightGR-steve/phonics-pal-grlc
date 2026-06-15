@@ -104,10 +104,10 @@ const PHONIC_DATA = [
   { id: 'e_e', letter: 'e_e', word: 'these', image: '👉', type: 'silent_e', why: 'Silent e makes e say /ē/.', voiceOver: "E-e says ē. These. Th—ese. Ē." },
   { id: 'i_e', letter: 'i_e', word: 'kite', image: '🪁', type: 'silent_e', why: 'Silent e makes i say /ī/.', voiceOver: "I-e says ī. Kite. K—ite. Ī." },
   { id: 'o_e', letter: 'o_e', word: 'nose', image: '👃', type: 'silent_e', why: 'Silent e makes o say /ō/.', voiceOver: "O-e says ō. Nose. N—ose. Ō." },
-  { id: 'u_e', letter: 'u_e', word: 'cube', image: '🧊', type: 'silent_e', why: 'Sometimes u starts with a /y/ sound and says /yoo/.', voiceOver: "U-e says ū. Cube. C—ube. Ū." },
+  { id: 'u_e', letter: 'u_e', word: 'cube', image: '🧊', type: 'silent_e', why: 'Silent e makes u say /ū/.', voiceOver: "U-e says ū. Cube. C—ube. Ū." },
   {
     id: 'u_yoo', letter: 'u_e', word: 'tune', image: '🎵', type: 'silent_e',
-    why: 'Silent e makes u say /ū/.',
+    why: 'Sometimes u starts with a /y/ sound and says /yoo/.',
     voiceOver: "U says yoo. Tune. T—une. Yoo."
   },
 
@@ -245,6 +245,35 @@ const createWavBlob = (pcm16Buffer, sampleRate = 24000) => {
     dest.set(new Uint8Array(pcm16Buffer));
     return new Blob([view], { type: 'audio/wav' });
 };
+
+// Fold the app's 14 phonic types into the kit's 4 phonics categories; rare/other
+// patterns fall back to a neutral Primary-Blue treatment. Both the stack card's
+// big letter and the grid tiles read from this single source so the same card
+// shows the same color in either view.
+// Color source of truth: playful-scholar-kit/tokens.css
+const CATEGORY_BY_TYPE = {
+  // Vowels
+  short_vowel: 'vowels', silent_e: 'vowels', vowel_team: 'vowels',
+  r_controlled: 'vowels', y_vowel: 'vowels', adv_vowel: 'vowels',
+  // Consonants
+  consonant: 'consonants', silent: 'consonants',
+  // Digraphs & blends
+  digraph: 'digraphs', blend: 'digraphs',
+  // Suffixes & endings
+  suffix: 'suffixes', ending: 'suffixes',
+};
+const categoryOf = (type) => CATEGORY_BY_TYPE[type] || 'default';
+
+// Kit phonics-category color classes. Grid borders/badges use the same hue at
+// low opacity so a tile reads as the same category as the card's big letter.
+const CATEGORY_STYLES = {
+  vowels:     { text: 'text-phonics-vowels',     decoration: 'decoration-phonics-vowels',     border: 'border-phonics-vowels/40',     badge: 'bg-phonics-vowels/10 text-phonics-vowels',         menuHover: 'hover:bg-phonics-vowels hover:text-white' },
+  consonants: { text: 'text-phonics-consonants', decoration: 'decoration-phonics-consonants', border: 'border-phonics-consonants/40', badge: 'bg-phonics-consonants/10 text-phonics-consonants', menuHover: 'hover:bg-phonics-consonants hover:text-white' },
+  digraphs:   { text: 'text-phonics-digraphs',   decoration: 'decoration-phonics-digraphs',   border: 'border-phonics-digraphs/40',   badge: 'bg-phonics-digraphs/10 text-phonics-digraphs',     menuHover: 'hover:bg-phonics-digraphs hover:text-white' },
+  suffixes:   { text: 'text-phonics-suffixes',   decoration: 'decoration-phonics-suffixes',   border: 'border-phonics-suffixes/40',   badge: 'bg-phonics-suffixes/10 text-phonics-suffixes',     menuHover: 'hover:bg-phonics-suffixes hover:text-white' },
+  default:    { text: 'text-ps-blue',            decoration: 'decoration-ps-blue',            border: 'border-ps-blue/40',            badge: 'bg-ps-blue/10 text-ps-blue',                       menuHover: 'hover:bg-ps-blue hover:text-white' },
+};
+const letterColorClass = (type) => CATEGORY_STYLES[categoryOf(type)].text;
 
 const App = () => {
   // -- State --
@@ -672,6 +701,7 @@ const App = () => {
 
   const renderHighlightedWord = (item) => {
     const { word, letter, type } = item;
+    const style = CATEGORY_STYLES[categoryOf(type)];
     if (type === 'silent_e' && letter.includes('_')) {
         const [startChar, endChar] = letter.split('_');
         const parts = word.split('');
@@ -681,7 +711,7 @@ const App = () => {
                     const isFirst = char === startChar && idx === word.indexOf(startChar);
                     const isLast = char === endChar && idx === word.lastIndexOf(endChar);
                     if (isFirst || isLast) {
-                        return <span key={idx} className="font-black text-indigo-600 underline decoration-2 decoration-indigo-300 underline-offset-4">{char}</span>;
+                        return <span key={idx} className={`font-bold ${style.text} underline decoration-2 ${style.decoration} underline-offset-4`}>{char}</span>;
                     }
                     return <span key={idx}>{char}</span>;
                 })}
@@ -694,7 +724,7 @@ const App = () => {
         return (
             <span className="tracking-wide">
                 {word.substring(0, idx)}
-                <span className="font-black text-indigo-600 underline decoration-2 decoration-indigo-300 underline-offset-4">{word.substring(idx, idx + pattern.length)}</span>
+                <span className={`font-bold ${style.text} underline decoration-2 ${style.decoration} underline-offset-4`}>{word.substring(idx, idx + pattern.length)}</span>
                 {word.substring(idx + pattern.length)}
             </span>
         );
@@ -708,9 +738,9 @@ const App = () => {
     <>
         {/* Main Audio Control - ONLY SHOW IF ADMIN */}
         {isAdmin && (
-        <div className="w-full mb-6 bg-slate-50 rounded-xl p-3 border border-slate-200 border-l-4 border-l-indigo-500">
+        <div className="w-full mb-6 bg-slate-50 rounded-xl p-3 border border-slate-200 border-l-4 border-l-ps-blue">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1"><Lock className="w-3 h-3" /> Teacher Controls ({useFirebase ? 'Cloud' : 'Local'})</span>
+                <span className="text-[10px] font-bold text-ps-blue uppercase tracking-wider flex items-center gap-1"><Lock className="w-3 h-3" /> Teacher Controls ({useFirebase ? 'Cloud' : 'Local'})</span>
                 {customRecordings[card.id] && (
                     <button onClick={() => deleteRecording(card.id)} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
                         <Trash2 className="w-3 h-3" /> Clear
@@ -721,7 +751,7 @@ const App = () => {
                 <button
                     onClick={() => generateAIAudio(card.id, card.voiceOver)}
                     disabled={!!recordingActiveId || !!generatingActiveId}
-                    className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full transition-colors ${generatingActiveId === card.id ? 'bg-indigo-100 text-indigo-400 cursor-wait' : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:scale-105 active:scale-95'}`}
+                    className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full transition-colors ${generatingActiveId === card.id ? 'bg-blue-light text-ps-blue cursor-wait' : 'bg-gradient-to-r from-ps-blue to-phonics-vowels text-white hover:shadow-lg hover:scale-105 active:scale-95'}`}
                 >
                     {generatingActiveId === card.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
                     {generatingActiveId === card.id ? 'Generating...' : 'AI Voice'}
@@ -748,7 +778,7 @@ const App = () => {
             </div>
 
             {/* Big Letter */}
-            <div className="text-8xl font-black tracking-tighter leading-none text-indigo-600">
+            <div className={`text-8xl font-bold tracking-tighter leading-none ${letterColorClass(card.type)}`}>
                 {card.letter.replace('_', '-')}
             </div>
         </div>
@@ -767,13 +797,13 @@ const App = () => {
             
             {/* Interactive "Why" Section */}
             {card.why && (
-                <div className="bg-indigo-50 rounded-xl border border-indigo-100 overflow-hidden relative group">
+                <div className="bg-blue-light/40 rounded-xl border border-blue-light overflow-hidden relative group">
                     {/* Text / Play Area */}
                     <button 
                         onClick={() => playAudioGeneric(whyId, card.why)}
-                        className="w-full text-left p-4 hover:bg-indigo-100/50 transition-colors"
+                        className="w-full text-left p-4 hover:bg-blue-light/60 transition-colors"
                     >
-                        <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm mb-1">
+                        <div className="flex items-center gap-2 text-ps-blue font-bold text-sm mb-1">
                             <GraduationCap className="w-4 h-4" /> WHY?
                             {isPlaying === whyId ? <Volume2 className="w-3 h-3 animate-pulse" /> : <Play className="w-3 h-3 opacity-50" />}
                         </div>
@@ -782,8 +812,8 @@ const App = () => {
 
                     {/* Why Toolbar - ONLY SHOW IF ADMIN */}
                     {isAdmin && (
-                    <div className="flex items-center justify-end gap-2 px-3 py-2 bg-indigo-100/50 border-t border-indigo-200/50">
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase mr-auto"><Lock className="w-3 h-3 inline" /> Edit (Why)</span>
+                    <div className="flex items-center justify-end gap-2 px-3 py-2 bg-blue-light/40 border-t border-blue-light">
+                        <span className="text-[10px] font-bold text-neutral uppercase mr-auto"><Lock className="w-3 h-3 inline" /> Edit (Why)</span>
                         
                         {customRecordings[whyId] && (
                             <button onClick={(e) => {e.stopPropagation(); deleteRecording(whyId)}} className="p-1.5 text-red-500 hover:bg-red-100 rounded-md" title="Clear Recording">
@@ -794,7 +824,7 @@ const App = () => {
                         <button 
                             onClick={(e) => {e.stopPropagation(); generateAIAudio(whyId, card.why)}} 
                             disabled={!!recordingActiveId || !!generatingActiveId}
-                            className="p-1.5 text-indigo-600 hover:bg-indigo-200 rounded-md disabled:opacity-50" 
+                            className="p-1.5 text-ps-blue hover:bg-blue-light rounded-md disabled:opacity-50"
                             title="Generate AI Voice"
                         >
                             {generatingActiveId === whyId ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
@@ -818,13 +848,13 @@ const App = () => {
   )};
 
   return (
-    <div className="h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 overflow-hidden flex flex-col">
+    <div className="h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-light overflow-hidden flex flex-col">
 
       {/* --- Header --- */}
       <header className="bg-white border-b border-slate-200 z-20 shadow-sm shrink-0">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-lg shadow-indigo-200 shadow-md">
+            <div className="bg-ps-blue p-2 rounded-lg shadow-md">
               <Volume2 className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -837,10 +867,10 @@ const App = () => {
           <div className="flex items-center gap-4">
             {/* View Mode Toggle */}
             <div className="flex items-center bg-slate-100 rounded-lg p-1">
-                <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-ps-blue' : 'text-slate-400 hover:text-slate-600'}`}>
                     <LayoutGrid className="w-5 h-5" />
                 </button>
-                <button onClick={() => setViewMode('stack')} className={`p-2 rounded-md transition-all ${viewMode === 'stack' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                <button onClick={() => setViewMode('stack')} className={`p-2 rounded-md transition-all ${viewMode === 'stack' ? 'bg-white shadow-sm text-ps-blue' : 'text-slate-400 hover:text-slate-600'}`}>
                     <Layers className="w-5 h-5" />
                 </button>
             </div>
@@ -853,22 +883,33 @@ const App = () => {
 
       </header>
 
-      {/* Categories Button & Expandable Menu - Centered above cards */}
-      <div className="w-full flex justify-center px-4 py-2 md:py-3 shrink-0">
-        <div className="relative">
+      {/* Categories Button & Expandable Menu + stack nav - Centered above cards */}
+      <div className="w-full flex flex-col items-center px-4 py-2 md:py-3 shrink-0">
+        <div className="flex items-center justify-center gap-3 sm:gap-4">
+          {viewMode === 'stack' && filteredData.length > 0 && (
+            <button
+              onClick={handlePrev}
+              disabled={stackIndex === 0}
+              aria-label="Previous card"
+              className="p-3 rounded-full bg-ps-blue text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all shrink-0"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+          <div className="relative">
           {/* Main Category Button */}
           <button
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
             className="flex items-center gap-3 px-6 py-3 bg-white rounded-full font-bold text-lg
               shadow-lg border-2 border-slate-200 transition-all duration-300 transform
-              hover:scale-105 hover:shadow-xl hover:border-indigo-300 active:scale-95"
+              hover:scale-105 hover:shadow-xl hover:border-ps-blue active:scale-95"
           >
-            <span className="text-indigo-600">{categories.find(c => c.id === selectedCategory)?.label || 'All Cards'}</span>
+            <span className="text-ps-blue">{categories.find(c => c.id === selectedCategory)?.label || 'All Cards'}</span>
             <div className={`
-              w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center
+              w-8 h-8 rounded-full bg-blue-light flex items-center justify-center
               transition-transform duration-300 ${showCategoryDropdown ? 'rotate-180' : ''}
             `}>
-              <ChevronDown className="w-5 h-5 text-indigo-600" />
+              <ChevronDown className="w-5 h-5 text-ps-blue" />
             </div>
           </button>
 
@@ -892,7 +933,9 @@ const App = () => {
 
               {/* Category Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 relative">
-                {categories.map((cat, idx) => (
+                {categories.map((cat, idx) => {
+                  const optStyle = CATEGORY_STYLES[categoryOf(cat.id)];
+                  return (
                   <button
                     key={cat.id}
                     onClick={() => {
@@ -901,22 +944,39 @@ const App = () => {
                     }}
                     style={{ animationDelay: `${idx * 30}ms` }}
                     className={`
-                      px-3 py-3 rounded-xl font-semibold text-sm
+                      px-3 py-3 rounded-xl font-bold text-sm
                       transition-all duration-200 transform hover:scale-105 active:scale-95
                       ${showCategoryDropdown ? 'animate-in fade-in zoom-in' : ''}
                       ${selectedCategory === cat.id
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                        : 'bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700'
+                        ? 'bg-ps-blue text-white shadow-lg'
+                        : `bg-slate-100 ${optStyle.text} ${optStyle.menuHover}`
                       }
                     `}
                   >
                     {cat.label}
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
+          {viewMode === 'stack' && filteredData.length > 0 && (
+            <button
+              onClick={handleNext}
+              disabled={stackIndex === filteredData.length - 1}
+              aria-label="Next card"
+              className="p-3 rounded-full bg-ps-blue text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all shrink-0"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+        </div>
+        {viewMode === 'stack' && filteredData.length > 0 && (
+          <span className="mt-2 font-bold text-slate-400 text-sm tracking-widest uppercase">
+            Card {stackIndex + 1} of {filteredData.length}
+          </span>
+        )}
       </div>
 
       {/* --- Settings Modal --- */}
@@ -930,16 +990,16 @@ const App = () => {
             <div className="space-y-4">
               <div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-700">Speed ({rate}x)</label>
-                  <input type="range" min="0.5" max="1.5" step="0.1" value={rate} onChange={e => setRate(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-2"/>
+                  <label className="text-sm font-bold text-slate-700">Speed ({rate}x)</label>
+                  <input type="range" min="0.5" max="1.5" step="0.1" value={rate} onChange={e => setRate(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ps-blue mt-2"/>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-semibold text-slate-700">Pitch ({pitch})</label>
-                <input type="range" min="0.5" max="2" step="0.1" value={pitch} onChange={e => setPitch(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-2"/>
+                <label className="text-sm font-bold text-slate-700">Pitch ({pitch})</label>
+                <input type="range" min="0.5" max="2" step="0.1" value={pitch} onChange={e => setPitch(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ps-blue mt-2"/>
               </div>
               <div>
-                <label className="text-sm font-semibold text-slate-700">Voice</label>
+                <label className="text-sm font-bold text-slate-700">Voice</label>
                 <select value={selectedVoiceIndex} onChange={e => setSelectedVoiceIndex(parseInt(e.target.value))} className="w-full mt-2 p-2 border rounded-lg text-sm">
                   {voices.map((v, i) => <option key={i} value={i}>{v.name.slice(0,30)}</option>)}
                 </select>
@@ -956,32 +1016,19 @@ const App = () => {
         {viewMode === 'grid' && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 max-h-[70vh] overflow-y-auto w-full p-2">
             {filteredData.map((item) => {
-                let borderColor = 'border-slate-200';
-                let textColor = 'text-slate-700';
-                let badgeColor = 'bg-slate-100 text-slate-500';
-
-                if (item.type.includes('vowel') || item.type === 'adv_vowel') {
-                    borderColor = 'border-red-200'; textColor = 'text-red-600'; badgeColor = 'bg-red-100 text-red-600';
-                } else if (item.type.includes('consonant')) {
-                    borderColor = 'border-blue-200'; textColor = 'text-blue-600'; badgeColor = 'bg-blue-100 text-blue-600';
-                } else if (item.type === 'digraph' || item.type === 'blend') {
-                    borderColor = 'border-emerald-200'; textColor = 'text-emerald-600'; badgeColor = 'bg-emerald-100 text-emerald-600';
-                } else if (item.type === 'suffix' || item.type === 'ending') {
-                    borderColor = 'border-amber-200'; textColor = 'text-amber-600'; badgeColor = 'bg-amber-100 text-amber-600';
-                }
-                
+                const style = CATEGORY_STYLES[categoryOf(item.type)];
                 const hasCustom = !!customRecordings[item.id];
 
                 return (
                 <button
                     key={item.id}
                     onClick={() => handleCardClick(item)}
-                    className={`group relative flex flex-col items-center justify-center p-3 py-5 rounded-xl border-2 bg-white transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95 ${borderColor} ${isAdmin && hasCustom ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+                    className={`group relative flex flex-col items-center justify-center p-3 py-5 rounded-xl border-2 bg-white transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95 ${style.border} ${isAdmin && hasCustom ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
                 >
                     {isAdmin && hasCustom && <div className="absolute top-2 right-2 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>}
                     <span className="text-2xl mb-2 opacity-50 grayscale group-hover:grayscale-0 transition-all">{item.image}</span>
-                    <span className={`text-2xl font-black tracking-tight ${textColor}`}>{item.letter.replace('_', ' ')}</span>
-                    <span className={`mt-2 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${badgeColor}`}>{item.word}</span>
+                    <span className={`text-2xl font-bold tracking-tight ${style.text}`}>{item.letter.replace('_', ' ')}</span>
+                    <span className={`mt-2 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${style.badge}`}>{item.word}</span>
                 </button>
                 );
             })}
@@ -990,46 +1037,24 @@ const App = () => {
 
         {/* STACK VIEW */}
         {viewMode === 'stack' && filteredData.length > 0 && (
-            <div className="flex flex-col items-center max-w-lg mx-auto w-full flex-1 min-h-0">
-                <div className="bg-white rounded-3xl shadow-xl w-full text-center relative flex flex-col overflow-hidden flex-1 min-h-0">
+            <div className="flex flex-col items-center max-w-lg mx-auto w-full min-h-0 max-h-full">
+                <div className="bg-white rounded-3xl shadow-xl w-full text-center relative flex flex-col overflow-hidden min-h-0">
 
-                    <div className="p-6 md:p-8 flex-1 overflow-y-auto min-h-0">
+                    <div className="p-6 md:p-8 overflow-y-auto min-h-0">
                         {renderCardContent(filteredData[stackIndex])}
                     </div>
 
                     <div className="p-3 md:p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4 shrink-0 rounded-b-3xl">
                         <button
                             onClick={() => playAudioGeneric(filteredData[stackIndex].id, filteredData[stackIndex].voiceOver)}
-                            className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
+                            className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[filteredData[stackIndex].id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-ps-blue text-white'}`}
                         >
                             {audioLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Loading Audio...</> : isPlaying === filteredData[stackIndex].id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> Play Sound</>}
                         </button>
                     </div>
                 </div>
 
-                {/* Stack Navigation Controls */}
-                <div className="flex items-center justify-between w-full mt-4 md:mt-6 px-4 shrink-0">
-                    <button
-                        onClick={handlePrev}
-                        disabled={stackIndex === 0}
-                        className="p-4 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all"
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-
-                    <span className="font-bold text-slate-400 text-sm tracking-widest uppercase">
-                        Card {stackIndex + 1} of {filteredData.length}
-                    </span>
-
-                    <button
-                        onClick={handleNext}
-                        disabled={stackIndex === filteredData.length - 1}
-                        className="p-4 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all"
-                    >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
-                </div>
-                <p className="text-xs text-slate-400 mt-2 md:mt-4 shrink-0">Tip: Use Left/Right arrow keys to flip</p>
+                <p className="text-xs text-slate-400 mt-3 shrink-0">Tip: Use Left/Right arrow keys to flip</p>
             </div>
         )}
       </main>
@@ -1048,7 +1073,7 @@ const App = () => {
             <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center gap-4">
               <button
                 onClick={() => playAudioGeneric(activeCard.id, activeCard.voiceOver)}
-                className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-indigo-600 text-white shadow-indigo-200'}`}
+                className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all active:scale-95 ${isAdmin && customRecordings[activeCard.id] ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-ps-blue text-white'}`}
               >
                 {audioLoading ? <><Loader2 className="w-5 h-5 animate-spin" /> Loading Audio...</> : isPlaying === activeCard.id ? <><Volume2 className="w-5 h-5 animate-pulse" /> Playing...</> : <><Play className="w-5 h-5" /> {isAdmin && customRecordings[activeCard.id] ? 'Play Custom' : 'Play Sound'}</>}
               </button>
