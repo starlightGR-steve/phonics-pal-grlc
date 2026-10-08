@@ -246,6 +246,10 @@ const createWavBlob = (pcm16Buffer, sampleRate = 24000) => {
     return new Blob([view], { type: 'audio/wav' });
 };
 
+// 10ms of silence. iOS/Safari only lets an <audio> element play if play() is first called
+// inside a user tap, so we "unlock" an element with this when the real sound isn't ready yet.
+const SILENT_WAV_URL = URL.createObjectURL(createWavBlob(new ArrayBuffer(480), 24000));
+
 // Fold the app's 14 phonic types into the kit's 4 phonics categories; rare/other
 // patterns fall back to a neutral Primary-Blue treatment. Both the stack card's
 // big letter and the grid tiles read from this single source so the same card
@@ -353,7 +357,7 @@ const App = () => {
 
         // Fire any queued play using `recordings` directly — avoids stale React state closure
         if (pendingPlayRef.current) {
-          const { id } = pendingPlayRef.current;
+          const { id, audio: unlockedAudio } = pendingPlayRef.current;
           pendingPlayRef.current = null;
           if (recordings[id]) {
             if (currentAudioRef.current) {
@@ -361,7 +365,9 @@ const App = () => {
               currentAudioRef.current = null;
             }
             window.speechSynthesis.cancel();
-            const audio = new Audio(recordings[id]);
+            // Reuse the element unlocked during the tap — a fresh Audio() here is blocked on iOS
+            const audio = unlockedAudio || new Audio();
+            audio.src = recordings[id];
             currentAudioRef.current = audio;
             setIsPlaying(id);
             audio.onended = () => { setIsPlaying(null); currentAudioRef.current = null; };
@@ -583,7 +589,10 @@ const App = () => {
   const playAudioGeneric = useCallback(async (targetId, textFallback) => {
     // If Firebase recordings haven't loaded yet, queue this request and wait
     if (audioLoadingRef.current) {
-      pendingPlayRef.current = { id: targetId, voiceOver: textFallback };
+      // Play silence now, inside the tap, so iOS will let this element play the real sound later
+      const unlockedAudio = new Audio(SILENT_WAV_URL);
+      unlockedAudio.play().catch(() => {});
+      pendingPlayRef.current = { id: targetId, voiceOver: textFallback, audio: unlockedAudio };
       console.log("⏳ Recordings still loading — queued play for", targetId);
       return;
     }
@@ -615,7 +624,9 @@ const App = () => {
           const freshUrl = await getAudioURLFromFirebase(targetId);
           if (freshUrl) {
             setCustomRecordings(prev => ({ ...prev, [targetId]: freshUrl }));
-            const retryAudio = new Audio(freshUrl);
+            // Reuse the same element — it was started inside the tap, so iOS allows the retry
+            const retryAudio = audio;
+            retryAudio.src = freshUrl;
             currentAudioRef.current = retryAudio;
             retryAudio.onended = () => {
               setIsPlaying(null);
